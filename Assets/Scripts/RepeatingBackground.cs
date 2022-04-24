@@ -12,7 +12,6 @@ public class RepeatingBackground : MonoBehaviour
         groundCollider = GetComponent<BoxCollider2D>();
         groundHorizontalLength = groundCollider.size.x * gameObject.transform.localScale.x;
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -20,11 +19,10 @@ public class RepeatingBackground : MonoBehaviour
         {
             RepositionBackground();
         }
-    }
+   }
     private void RepositionBackground()
     {
         Vector2 groundOffset = new Vector2(groundHorizontalLength*2f,0);
-        transform.position = (Vector2)transform.position + groundOffset;
-        
+        transform.position = (Vector2)transform.position + groundOffset;       
     }
 }

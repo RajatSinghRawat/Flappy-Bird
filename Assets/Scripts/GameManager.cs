@@ -7,18 +7,12 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
-    public GameObject gameOverText;
-    public bool gameOver = false;
-    public float scrollSpeed = -1.5f;
-    private int score = 0,highscore=0;
-    private Text[] scoreElements;
-    private Text scoreText,highscoreText;
-    
+    private static GameManager instance;
+    private bool gameOver = false;
+    private float scrollSpeed = -30f;
+
     void Awake()
-    {
-        highscore = PlayerPrefs.GetInt("highscore",0);
-       // Debug.Log(PlayerPrefs.GetInt("highscore",0));
+    {     
         if(instance==null)
         {
             instance = this;
@@ -28,47 +22,53 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    private void Start()
-    {
-        scoreElements = FindObjectsOfType<Text>();
-        for (int i = 0; i < scoreElements.Length; i++)
-        {
-            if(scoreElements[i].GetComponent<Text>().text== "")
-            {
-                scoreText = scoreElements[i];
-                scoreText.text = "Score: 0";
-            }
-            else if(scoreElements[i].GetComponent<Text>().text== "HIGHSCORE:")
-            {
-                highscoreText = scoreElements[i];
-                highscoreText.text = "HIGHSCORE: "+highscore.ToString();
-            }
-        }
-    }
     // Update is called once per frame
     void Update()
     {
-        if(gameOver==true&&Input.GetMouseButtonDown(0))
+        if (gameOver==true&&Input.GetMouseButtonDown(0))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
-    public void BirdScored()
+
+    public delegate void BirdScoredHandler();
+    public static event BirdScoredHandler OnBirdScored;
+    private void BirdScored()
     {
         if(gameOver)
         {
             return;
         }
-        score++;
-        scoreText.text = "Score: " + score.ToString();        
-    }
-    public void BirdDied()
-    {
-        gameOverText.SetActive(true);
-        gameOver = true;
-        if(score>highscore)
+        else if(OnBirdScored != null)
         {
-            PlayerPrefs.SetInt("highscore", score);
+            OnBirdScored();
         }
     }
+    public static void B_Scored()
+    {
+        instance.BirdScored();
+    }
+
+    public delegate void BirdDiedHandler();
+    public static event BirdDiedHandler OnBirdDied;
+    private void BirdDied()
+    {
+        gameOver = true;
+        if(OnBirdDied!=null)
+        {
+            OnBirdDied();
+        }
+    }
+    public static void B_Died()
+    {
+        instance.BirdDied();
+    }
+    public static bool chkGameStatus()
+    {
+        return instance.gameOver;
+    }
+    public static float getScrollSpeed()
+    {
+        return instance.scrollSpeed;
+    }  
 }
